@@ -38,6 +38,7 @@
 
 // resize image
 inline cv::Mat ResizeShortWithin(cv::Mat src, int short_size, int max_size, int mult_base) {
+    cv::Mat dst;
     cv::resize(src, dst, cv::Size(max_size, short_size));
     return dst;
 }
