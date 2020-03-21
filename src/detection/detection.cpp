@@ -139,19 +139,16 @@ void RunDemo() {
   tvm::runtime::Module mod = (*tvm::runtime::Registry::Get("tvm.graph_runtime.create"))(json_data, mod_syslib, device_type, device_id);
 
   // load image data
-  cv::Mat image = cv::imread(args::image, 1);
+  CImg<float> image(args::image.c_str());
   // resize to match the input of model
   image = ResizeShortWithin(image, args::min_size, args::max_size, args::multiplier);
     
   DLTensor* input;
   int in_ndim = 4;
-  int64_t in_shape[4] = {1, image.rows, image.cols, 3};
+  int64_t in_shape[4] = {1, image.height(), image.width(), 3};
   TVMArrayAlloc(in_shape, in_ndim, dtype_code, dtype_bits, dtype_lanes, device_type, device_id, &input);
-  cv::Mat rgb_image;
-  cv::cvtColor(image, rgb_image, cv::COLOR_BGR2RGB);
-  // convert to float32 from uint8
-  rgb_image.convertTo(rgb_image, CV_32FC3);
-  TVMArrayCopyFromBytes(input,rgb_image.data,image.rows*image.cols*3*4);
+  
+  TVMArrayCopyFromBytes(input,image.data(),image.height()*image.width()*3*4);
 
   tvm::runtime::PackedFunc set_input = mod.GetFunction("set_input");
   set_input("data", input);
@@ -181,17 +178,16 @@ void RunDemo() {
   
   // draw boxes
   std::string str_res;
-  auto plt = viz::PlotBbox(image, bbox_vec, score_vec, id_vec, args::viz_thresh, synset::CLASS_NAMES, std::map<int, cv::Scalar>(), !args::quite, str_res);
+  auto plt = viz::PlotBbox(image, bbox_vec, score_vec, id_vec, args::viz_thresh, synset::CLASS_NAMES, std::map<int, std::vector<unsigned char>>(), !args::quite, str_res);
 
   // display drawn image
     if (!args::no_display) {
-        cv::imshow("plot", plt);
-        cv::waitKey();
+        
     }
 
     // output image
     if (!args::output_image.empty()) {
-        cv::imwrite(args::output_image, plt);
+        plt.save(args::output_image.c_str());
     }
     
     //output file

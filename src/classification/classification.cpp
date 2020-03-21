@@ -99,17 +99,17 @@ void RunDemo() {
 
   DLTensor* input;
   int in_ndim = 4;
-  int64_t in_shape[4] = {1, 224, 224, 3};
+  int64_t in_shape[4] = {1, 3, 224, 224};
   TVMArrayAlloc(in_shape, in_ndim, dtype_code, dtype_bits, dtype_lanes, device_type, device_id, &input);
   // load image data
-  cv::Mat image = cv::imread(args::image, 1);
-  // resize image short side to 256, keep aspect ratio, and crop the center square of size 224
+  
+  CImg<float> image(args::image.c_str());
+  
+  
   image = ResizeShortCrop(image, args::min_size);
-  cv::Mat rgb_image;
-  cv::cvtColor(image, rgb_image, cv::COLOR_BGR2RGB);
-  // convert to float32 from uint8
-  rgb_image.convertTo(rgb_image, CV_32FC3);
-  TVMArrayCopyFromBytes(input,rgb_image.data,224*224*3*4);
+  
+  
+  TVMArrayCopyFromBytes(input,image.data(),224*224*3*4);
 
   tvm::runtime::PackedFunc set_input = mod.GetFunction("set_input");
   set_input("data", input);

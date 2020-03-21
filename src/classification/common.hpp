@@ -23,7 +23,9 @@
  * \brief Common functions for GluonCV cpp inference demo
  * \author  
  */
-#include <opencv2/opencv.hpp>
+#define cimg_use_jpeg
+#define cimg_use_png
+#include "CImg.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -35,11 +37,12 @@
 #include <iomanip>
 #include <vector>
 
+using namespace cimg_library;
 
 // resize short and center crop
-inline cv::Mat ResizeShortCrop(cv::Mat src, int short_size) {
-    double h = src.rows;
-    double w = src.cols;
+inline CImg<float> ResizeShortCrop(CImg<float> & src, int short_size) {
+    double h = src.height();
+    double w = src.width();
     double im_size_min = h;
     double im_size_max = w;
     if (w < h) {
@@ -49,14 +52,14 @@ inline cv::Mat ResizeShortCrop(cv::Mat src, int short_size) {
     double scale = static_cast<double>(short_size) / static_cast<double>(im_size_min);
     int new_w = static_cast<int>(std::floor(w * scale));
     int new_h = static_cast<int>(std::round(h * scale));
-    cv::Mat dst;
-    cv::resize(src, dst, cv::Size(new_w, new_h));
+    
+    src.resize(new_w, new_h, -100, -100, 3);
+
     int rec_x = static_cast<int>(std::round(new_w/2-112));
     int rec_y = static_cast<int>(std::round(new_h/2-112));
-    cv::Rect roi(rec_x, rec_y, 224, 224);
-    cv::Mat res;
-    dst(roi).copyTo(res);
-    return res;
+    
+    src.crop(rec_x, rec_y, rec_x+223, rec_y+223);
+    return src;
 }
 
 inline bool EndsWith(std::string const & value, std::string const & ending)

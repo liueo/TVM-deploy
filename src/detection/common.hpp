@@ -24,7 +24,9 @@
  * \author
  */
 
-#include <opencv2/opencv.hpp>
+#define cimg_use_jpeg
+#define cimg_use_png
+#include "CImg.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -35,12 +37,12 @@
 #include <random>
 #include <iomanip>
 
+using namespace cimg_library;
 
 // resize image
-inline cv::Mat ResizeShortWithin(cv::Mat src, int short_size, int max_size, int mult_base) {
-    cv::Mat dst;
-    cv::resize(src, dst, cv::Size(max_size, short_size));
-    return dst;
+inline CImg<float> ResizeShortWithin(CImg<float> & src, int short_size, int max_size, int mult_base) {
+    src.resize(max_size, short_size, -100, -100, 3);
+    return src;
 }
 
 
@@ -70,39 +72,25 @@ inline std::vector<std::string> LoadClassNames(std::string filename) {
 
 namespace viz {
 // convert color from hsv to bgr for plotting
-inline cv::Scalar HSV2BGR(cv::Scalar hsv) {
-    cv::Mat from(1, 1, CV_32FC3, hsv);
-    cv::Mat to;
-    cv::cvtColor(from, to, cv::COLOR_HSV2BGR);
-    auto pixel = to.at<cv::Vec3f>(0, 0);
-    unsigned char b = static_cast<unsigned char>(pixel[0] * 255);
-    unsigned char g = static_cast<unsigned char>(pixel[1] * 255);
-    unsigned char r = static_cast<unsigned char>(pixel[2] * 255);
-    return cv::Scalar(b, g, r);
+inline std::vector<unsigned char> HSV2BGR(float h, float s, float v) {
+    CImg<float> color_f(1, 1, 1, 3, h, s, v);
+    CImg<int> color_i = color_f.HSVtoRGB();
+    int * value_i = color_i.data();
+    unsigned char r = static_cast<unsigned char>(*value_i);
+    unsigned char g = static_cast<unsigned char>(*(value_i+1));
+    unsigned char b = static_cast<unsigned char>(*(value_i+2));
+    std::vector<unsigned char> color_vec;
+    color_vec.emplace_back(r);
+    color_vec.emplace_back(g);
+    color_vec.emplace_back(b);
+    return color_vec;
 }
 
-inline void PutLabel(cv::Mat &im, const std::string label, const cv::Point & orig, cv::Scalar color) {
-    int fontface = cv::FONT_HERSHEY_DUPLEX;
-    double scale = 0.5;
-    int thickness = 1;
-    int baseline = 0;
-    double alpha = 0.6;
-
-    cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-    // make sure roi inside image region
-    cv::Rect blend_rect = cv::Rect(orig + cv::Point(0, baseline),
-        orig + cv::Point(text.width, -text.height)) & cv::Rect(0, 0, im.cols, im.rows);
-    cv::Mat roi = im(blend_rect);
-    cv::Mat blend(roi.size(), CV_8UC3, color);
-    // cv::rectangle(im, orig + cv::Point(0, baseline), orig + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
-    cv::addWeighted(blend, alpha, roi, 1.0 - alpha, 0.0, roi);
-    cv::putText(im, label, orig, fontface, scale, cv::Scalar(255, 255, 255), thickness, 8);
-}
 
 // plot bounding boxes on raw image
-inline cv::Mat PlotBbox(cv::Mat img, std::vector<float>& bboxes, std::vector<float>& scores, std::vector<float>& labels,
+inline CImg<float> PlotBbox(CImg<float> img, std::vector<float>& bboxes, std::vector<float>& scores, std::vector<float>& labels,
                float thresh, std::vector<std::string>& class_names,
-               std::map<int, cv::Scalar> colors, bool verbose, std::string& str) {
+               std::map<int, std::vector<unsigned char>> colors, bool verbose, std::string& str) {
     int num = scores.size();
     std::mt19937 eng;
     std::uniform_real_distribution<float> rng(0, 1);
@@ -124,20 +112,19 @@ inline cv::Mat PlotBbox(cv::Mat img, std::vector<float>& bboxes, std::vector<flo
             int csize = static_cast<int>(class_names.size());
             if (class_names.size() > 0) {
                 float hue = label / csize;
-                colors[cls_id] = HSV2BGR(cv::Scalar(hue * 255, 0.75, 0.95));
+                colors[cls_id] = HSV2BGR(hue * 255, 0.75, 0.95);
             } else {
                 // generate color for this id
                 hue += 0.618033988749895;  // golden ratio
                 hue = fmod(hue, 1.0);
-                colors[cls_id] = HSV2BGR(cv::Scalar(hue * 255, 0.75, 0.95));
+                colors[cls_id] = HSV2BGR(hue * 255, 0.75, 0.95);
             }
         }
 
         // draw bounding box
         auto color = colors[cls_id];
-        cv::Point pt1(bboxes[4*i], bboxes[4*i+1]);
-        cv::Point pt2(bboxes[4*i+2], bboxes[4*i+3]);
-        cv::rectangle(img, pt1, pt2, color, 2);
+        img.draw_rectangle(bboxes[4*i], bboxes[4*i+1], bboxes[4*i+2], bboxes[4*i+3], color.data(),0.7f,~0U);
+        
 
         if (verbose) {
             if (cls_id >= class_names.size()) {
@@ -166,7 +153,8 @@ inline cv::Mat PlotBbox(cv::Mat img, std::vector<float>& bboxes, std::vector<flo
         ss << std::fixed << std::setprecision(3) << score;
         txt += " " + ss.str();
         // cv::putText(img, txt, cv::Point(pt1.x, pt1.y - 5), , 0.6, color, 1);
-        PutLabel(img, txt, pt1, color);
+        img.draw_text(bboxes[4*i], bboxes[4*i+1],txt.c_str(),color.data(),0,0.7f,13);
+        
     }
     str = ss.str();
     return img;
