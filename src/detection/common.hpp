@@ -24,9 +24,10 @@
  * \author
  */
 
+#define cimg_display 0
 #define cimg_use_jpeg
 #define cimg_use_png
-#include "CImg.h"
+#include "../CImg.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -124,7 +125,7 @@ inline CImg<float> PlotBbox(CImg<float> img, std::vector<float>& bboxes, std::ve
         // draw bounding box
         auto color = colors[cls_id];
         img.draw_rectangle(bboxes[4*i], bboxes[4*i+1], bboxes[4*i+2], bboxes[4*i+3], color.data(),0.7f,~0U);
-        
+
 
         if (verbose) {
             if (cls_id >= class_names.size()) {
@@ -134,15 +135,15 @@ inline CImg<float> PlotBbox(CImg<float> img, std::vector<float>& bboxes, std::ve
             }
 
         }
-        
+
         if (cls_id >= class_names.size()) {
             ss << "\tid: " <<  cls_id << ", scores: " << std::fixed << std::setprecision(3) << score << ", coordinates of bounding box: top_left-(" << bboxes[4*i] << " , " << bboxes[4*i+1] << "), bottom_right-(" << bboxes[4*i+2] << " , " << bboxes[4*i+3] << ")\n";
         }
         else {
             ss << "\tid: " <<  class_names[cls_id] << ", scores: " << std::fixed << std::setprecision(3) << score << ", coordinates of bounding box: top_left-(" << bboxes[4*i] << " , " << bboxes[4*i+1] << "), bottom_right-(" << bboxes[4*i+2] << " , " << bboxes[4*i+3] << ")\n";
         }
-            
-        
+
+
 
         // put text
         std::string txt;
@@ -154,7 +155,7 @@ inline CImg<float> PlotBbox(CImg<float> img, std::vector<float>& bboxes, std::ve
         txt += " " + ss.str();
         // cv::putText(img, txt, cv::Point(pt1.x, pt1.y - 5), , 0.6, color, 1);
         img.draw_text(bboxes[4*i], bboxes[4*i+1],txt.c_str(),color.data(),0,0.7f,13);
-        
+
     }
     str = ss.str();
     return img;

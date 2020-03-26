@@ -37,17 +37,17 @@
  *  You need to remember to change it to point to the right file.
  *
  */
-#include "/home/ubuntu/tvm/src/runtime/c_runtime_api.cc"
-#include "/home/ubuntu/tvm/src/runtime/cpu_device_api.cc"
-#include "/home/ubuntu/tvm/src/runtime/workspace_pool.cc"
-#include "/home/ubuntu/tvm/src/runtime/library_module.cc"
-#include "/home/ubuntu/tvm/src/runtime/module.cc"
-#include "/home/ubuntu/tvm/src/runtime/registry.cc"
-#include "/home/ubuntu/tvm/src/runtime/file_util.cc"
-#include "/home/ubuntu/tvm/src/runtime/threading_backend.cc"
-#include "/home/ubuntu/tvm/src/runtime/thread_pool.cc"
-#include "/home/ubuntu/tvm/src/runtime/ndarray.cc"
-#include "/home/ubuntu/tvm/src/runtime/object.cc"
+#include "./tvm/src/runtime/c_runtime_api.cc"
+#include "./tvm/src/runtime/cpu_device_api.cc"
+#include "./tvm/src/runtime/workspace_pool.cc"
+#include "./tvm/src/runtime/library_module.cc"
+#include "./tvm/src/runtime/module.cc"
+#include "./tvm/src/runtime/registry.cc"
+#include "./tvm/src/runtime/file_util.cc"
+#include "./tvm/src/runtime/threading_backend.cc"
+#include "./tvm/src/runtime/thread_pool.cc"
+#include "./tvm/src/runtime/ndarray.cc"
+#include "./tvm/src/runtime/object.cc"
 
 // NOTE: all the files after this are optional modules
 // that you can include remove, depending on how much feature you use.
@@ -55,12 +55,12 @@
 // Likely we only need to enable one of the following
 // If you use Module::Load, use dso_module
 // For system packed library, use system_lib_module
-#include "/home/ubuntu/tvm/src/runtime/dso_library.cc"
-#include "/home/ubuntu/tvm/src/runtime/system_library.cc"
+#include "./tvm/src/runtime/dso_library.cc"
+#include "./tvm/src/runtime/system_library.cc"
 
 // Graph runtime
-#include "/home/ubuntu/tvm/src/runtime/graph/graph_runtime.cc"
-#include "/home/ubuntu/tvm/src/runtime/contrib/sort/sort.cc"
+#include "./tvm/src/runtime/graph/graph_runtime.cc"
+#include "./tvm/src/runtime/contrib/sort/sort.cc"
 
 // Uncomment the following lines to enable RPC
 // #include "../../src/runtime/rpc/rpc_session.cc"
@@ -77,8 +77,8 @@
 // #include "../../src/runtime/metal/metal_module.mm"
 
 // Uncomment the following lines to enable CUDA
-//#include "/home/ubuntu/tvm/src/runtime/cuda/cuda_device_api.cc"
-//#include "/home/ubuntu/tvm/src/runtime/cuda/cuda_module.cc"
+//#include "./tvm/src/runtime/cuda/cuda_device_api.cc"
+//#include "./tvm/src/runtime/cuda/cuda_module.cc"
 
 // Uncomment the following lines to enable OpenCL
 // #include "../../src/runtime/opencl/opencl_device_api.cc"
