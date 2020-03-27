@@ -21,11 +21,12 @@
  *  Copyright (c) 2020 by Contributors
  * \file common.hpp
  * \brief Common functions for GluonCV cpp inference demo
- * \author  
+ * \author
  */
+#define cimg_display 0
 #define cimg_use_jpeg
 #define cimg_use_png
-#include "CImg.h"
+#include "../CImg.h"
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -52,12 +53,12 @@ inline CImg<float> ResizeShortCrop(CImg<float> & src, int short_size) {
     double scale = static_cast<double>(short_size) / static_cast<double>(im_size_min);
     int new_w = static_cast<int>(std::floor(w * scale));
     int new_h = static_cast<int>(std::round(h * scale));
-    
+
     src.resize(new_w, new_h, -100, -100, 3);
 
     int rec_x = static_cast<int>(std::round(new_w/2-112));
     int rec_y = static_cast<int>(std::round(new_h/2-112));
-    
+
     src.crop(rec_x, rec_y, rec_x+223, rec_y+223);
     return src;
 }
@@ -106,7 +107,7 @@ inline void Softmax(std::vector<float>& output, std::vector<float>& res) {
     int num = output.size();
     float max_v = output[0];
     for (int i = 1; i < num; i++) {
-        if (output[i] > max_v) 
+        if (output[i] > max_v)
             max_v = output[i];
     }
     float sum = 0;
@@ -116,5 +117,5 @@ inline void Softmax(std::vector<float>& output, std::vector<float>& res) {
     for (int i = 0; i < num; i++) {
         res[i] = std::exp(output[i]-max_v) / sum;
     }
-}        
+}
 } //namespace compute
