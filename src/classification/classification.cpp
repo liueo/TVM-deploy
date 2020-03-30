@@ -76,12 +76,12 @@ void ParseArgs(int argc, char** argv) {
 
 void RunDemo() {
   // tvm module for compiled functions
-  tvm::runtime::Module mod_syslib = tvm::runtime::Module::LoadFromFile("ResNet50_v2_deploy_lib.so");
-  std::ifstream json_in("ResNet50_v2_deploy_graph.json", std::ios::in);
+  tvm::runtime::Module mod_syslib = tvm::runtime::Module::LoadFromFile("model_lib.so");
+  std::ifstream json_in("model_graph.json", std::ios::in);
   std::string json_data((std::istreambuf_iterator<char>(json_in)), std::istreambuf_iterator<char>());
   json_in.close();
 
-  std::ifstream params_in("ResNet50_v2_deploy_0000.params", std::ios::binary);
+  std::ifstream params_in("model_0000.params", std::ios::binary);
   std::string params_data((std::istreambuf_iterator<char>(params_in)), std::istreambuf_iterator<char>());
   params_in.close();
 

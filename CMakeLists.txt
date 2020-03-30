@@ -23,7 +23,7 @@ include_directories(${ZLIB_INCLUDE_DIR})
 link_directories(${PNG_LIB_DIRS})
 include_directories(${PNG_INCLUDE_DIR} )
 
-add_executable(gcv_lite_classify  tvm_runtime_pack.cc src/detection/detection.cpp)
+add_executable(gcv_lite_classify  tvm_runtime_pack.cc src/classification/classification.cpp)
 target_link_libraries(gcv_lite_classify    ${CMAKE_DL_LIBS}  ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${ZLIB_LIBRARIES})
 
 add_executable(gcv_lite_detection  tvm_runtime_pack.cc src/detection/detection.cpp)
