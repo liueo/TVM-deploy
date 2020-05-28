@@ -179,4 +179,4 @@ def export_tvm(path, block, data_shape, epoch=0, preprocess=True, layout='HWC',
 if __name__ == '__main__':
     import gluoncv as gcv
     model = gcv.model_zoo.get_model(args.model, pretrained=True)
-    export_tvm("model", model, (3,224,224), ctx=mx.cpu(), preprocess=MyPreprocess(), target='llvm', use_autotvm=False)
+    export_tvm("model", model, (3,224,224), ctx=mx.cpu(), preprocess=MyPreprocess(), target='llvm -mcpu=core-avx2', use_autotvm=False)
